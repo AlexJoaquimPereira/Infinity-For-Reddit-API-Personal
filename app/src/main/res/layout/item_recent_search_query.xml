@@ -3,7 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="16dp"
+    
+    // android:padding="16dp"
     android:clickable="true"
     android:focusable="true"
     android:background="?attr/selectableItemBackground">
@@ -15,6 +16,7 @@
         android:layout_weight="1"
         android:layout_gravity="center_vertical"
         android:fontFamily="?attr/font_family"
+        android:padding="16dp" //Added new 15.08.2023 https://github.com/Docile-Alligator/Infinity-For-Reddit/pull/1486
         android:textSize="?attr/font_default"
         android:drawablePadding="16dp" />
 
@@ -23,6 +25,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
+        android:padding="16dp" // Added new 15.08.2023
         android:clickable="true"
         android:focusable="true"
         android:background="?attr/selectableItemBackground" />
