@@ -16,6 +16,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import java.util.ArrayList;
+
+import ml.docilealligator.infinityforreddit.MediaMetadata;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.activities.BaseActivity;
@@ -37,8 +40,6 @@ import ml.docilealligator.infinityforreddit.utils.Utils;
 public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBottomSheetDialogFragment {
 
     public static final String EXTRA_COMMENT = "ECF";
-    public static final String EXTRA_ACCESS_TOKEN = "EAT";
-    public static final String EXTRA_ACCOUNT_NAME = "EAN";
     public static final String EXTRA_EDIT_AND_DELETE_AVAILABLE = "EEADA";
     public static final String EXTRA_POSITION = "EP";
     public static final String EXTRA_SHOW_REPLY_AND_SAVE_OPTION = "ESSARO";
@@ -71,12 +72,10 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
             dismiss();
             return binding.getRoot();
         }
-        String accessToken = bundle.getString(EXTRA_ACCESS_TOKEN);
-        String accountName = bundle.getString(EXTRA_ACCOUNT_NAME);
         boolean editAndDeleteAvailable = bundle.getBoolean(EXTRA_EDIT_AND_DELETE_AVAILABLE, false);
         boolean showReplyAndSaveOption = bundle.getBoolean(EXTRA_SHOW_REPLY_AND_SAVE_OPTION, false);
 
-        if (!accountName.equals(Account.ANONYMOUS_ACCOUNT) && !accessToken.equals("")) {
+        if (!activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) && !"".equals(activity.accessToken)) {
             if (editAndDeleteAvailable) {
                 binding.editTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
                 binding.deleteTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
@@ -85,6 +84,10 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                     Intent intent = new Intent(activity, EditCommentActivity.class);
                     intent.putExtra(EditCommentActivity.EXTRA_FULLNAME, comment.getFullName());
                     intent.putExtra(EditCommentActivity.EXTRA_CONTENT, comment.getCommentMarkdown());
+                    if (comment.getMediaMetadataMap() != null) {
+                        ArrayList<MediaMetadata> mediaMetadataList = new ArrayList<>(comment.getMediaMetadataMap().values());
+                        intent.putParcelableArrayListExtra(EditCommentActivity.EXTRA_MEDIA_METADATA_LIST, mediaMetadataList);
+                    }
                     intent.putExtra(EditCommentActivity.EXTRA_POSITION, bundle.getInt(EXTRA_POSITION));
                     if (activity instanceof ViewPostDetailActivity) {
                         activity.startActivityForResult(intent, ViewPostDetailActivity.EDIT_COMMENT_REQUEST_CODE);

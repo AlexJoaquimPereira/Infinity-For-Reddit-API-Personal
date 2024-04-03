@@ -45,6 +45,7 @@ import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper;
 import ml.docilealligator.infinityforreddit.customviews.slidr.Slidr;
+import ml.docilealligator.infinityforreddit.databinding.ActivityEditProfileBinding;
 import ml.docilealligator.infinityforreddit.events.SubmitChangeAvatarEvent;
 import ml.docilealligator.infinityforreddit.events.SubmitChangeBannerEvent;
 import ml.docilealligator.infinityforreddit.events.SubmitSaveProfileEvent;
@@ -61,29 +62,6 @@ public class EditProfileActivity extends BaseActivity {
     private static final int PICK_IMAGE_BANNER_REQUEST_CODE = 0x401;
     private static final int PICK_IMAGE_AVATAR_REQUEST_CODE = 0x402;
 
-    @BindView(R.id.root_layout_view_edit_profile_activity)
-    CoordinatorLayout coordinatorLayout;
-    @BindView(R.id.content_view_edit_profile_activity)
-    LinearLayout content;
-    @BindView(R.id.collapsing_toolbar_layout_edit_profile_activity)
-    CollapsingToolbarLayout collapsingToolbarLayout;
-    @BindView(R.id.appbar_layout_view_edit_profile_activity)
-    AppBarLayout appBarLayout;
-    @BindView(R.id.toolbar_view_edit_profile_activity)
-    MaterialToolbar toolbar;
-    @BindView(R.id.image_view_banner_edit_profile_activity)
-    GifImageView bannerImageView;
-    @BindView(R.id.image_view_avatar_edit_profile_activity)
-    GifImageView avatarImageView;
-    @BindView(R.id.image_view_change_banner_edit_profile_activity)
-    ImageView changeBanner;
-    @BindView(R.id.image_view_change_avatar_edit_profile_activity)
-    ImageView changeAvatar;
-    @BindView(R.id.edit_text_display_name_edit_profile_activity)
-    EditText editTextDisplayName;
-    @BindView(R.id.edit_text_about_you_edit_profile_activity)
-    EditText editTextAboutYou;
-
     @Inject
     @Named("current_account")
     SharedPreferences mCurrentAccountSharedPreferences;
@@ -97,9 +75,7 @@ public class EditProfileActivity extends BaseActivity {
     RedditDataRoomDatabase mRedditDataRoomDatabase;
     @Inject
     CustomThemeWrapper mCustomThemeWrapper;
-
-    private String mAccountName;
-    private String mAccessToken;
+    private ActivityEditProfileBinding binding;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,37 +84,33 @@ public class EditProfileActivity extends BaseActivity {
         setImmersiveModeNotApplicable();
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_edit_profile);
-
-        ButterKnife.bind(this);
+        binding = ActivityEditProfileBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
 
         EventBus.getDefault().register(this);
 
         applyCustomTheme();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && isChangeStatusBarIconColor()) {
-            addOnOffsetChangedListener(appBarLayout);
+            addOnOffsetChangedListener(binding.appbarLayoutViewEditProfileActivity);
         }
 
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbarViewEditProfileActivity);
 
         if (mSharedPreferences.getBoolean(SharedPreferencesUtils.SWIPE_RIGHT_TO_GO_BACK, true)) {
             Slidr.attach(this);
         }
 
-        mAccessToken = mCurrentAccountSharedPreferences.getString(SharedPreferencesUtils.ACCESS_TOKEN, null);
-        mAccountName = mCurrentAccountSharedPreferences.getString(SharedPreferencesUtils.ACCOUNT_NAME, Account.ANONYMOUS_ACCOUNT);
-
-        changeBanner.setOnClickListener(view -> {
+        binding.imageViewChangeBannerEditProfileActivity.setOnClickListener(view -> {
             startPickImage(PICK_IMAGE_BANNER_REQUEST_CODE);
         });
-        changeAvatar.setOnClickListener(view -> {
+        binding.imageViewChangeAvatarEditProfileActivity.setOnClickListener(view -> {
             startPickImage(PICK_IMAGE_AVATAR_REQUEST_CODE);
         });
 
         final RequestManager glide = Glide.with(this);
         final UserViewModel.Factory userViewModelFactory =
-                new UserViewModel.Factory(getApplication(), mRedditDataRoomDatabase, mAccountName);
+                new UserViewModel.Factory(getApplication(), mRedditDataRoomDatabase, accountName);
         final UserViewModel userViewModel =
                 new ViewModelProvider(this, userViewModelFactory).get(UserViewModel.class);
 
@@ -148,19 +120,19 @@ public class EditProfileActivity extends BaseActivity {
             }
             // BANNER
             final String userBanner = userData.getBanner();
-            LayoutParams cBannerLp = (LayoutParams) changeBanner.getLayoutParams();
+            LayoutParams cBannerLp = (LayoutParams) binding.imageViewChangeBannerEditProfileActivity.getLayoutParams();
             if (userBanner == null || userBanner.isEmpty()) {
-                changeBanner.setLongClickable(false);
+                binding.imageViewChangeBannerEditProfileActivity.setLongClickable(false);
                 cBannerLp.gravity = Gravity.CENTER;
-                changeBanner.setLayoutParams(cBannerLp);
-                changeBanner.setOnLongClickListener(v -> false);
+                binding.imageViewChangeBannerEditProfileActivity.setLayoutParams(cBannerLp);
+                binding.imageViewChangeBannerEditProfileActivity.setOnLongClickListener(v -> false);
             } else {
-                changeBanner.setLongClickable(true);
+                binding.imageViewChangeBannerEditProfileActivity.setLongClickable(true);
                 cBannerLp.gravity = Gravity.END | Gravity.BOTTOM;
-                changeBanner.setLayoutParams(cBannerLp);
-                glide.load(userBanner).into(bannerImageView);
-                changeBanner.setOnLongClickListener(view -> {
-                    if (mAccountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                binding.imageViewChangeBannerEditProfileActivity.setLayoutParams(cBannerLp);
+                glide.load(userBanner).into(binding.imageViewBannerEditProfileActivity);
+                binding.imageViewChangeBannerEditProfileActivity.setOnLongClickListener(view -> {
+                    if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
                         return false;
                     }
                     new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
@@ -168,15 +140,15 @@ public class EditProfileActivity extends BaseActivity {
                             .setMessage(R.string.are_you_sure)
                             .setPositiveButton(R.string.yes, (dialogInterface, i)
                                     -> EditProfileUtils.deleteBanner(mOauthRetrofit,
-                                    mAccessToken,
-                                    mAccountName,
+                                    accessToken,
+                                    accountName,
                                     new EditProfileUtils.EditProfileUtilsListener() {
                                         @Override
                                         public void success() {
                                             Toast.makeText(EditProfileActivity.this,
                                                     R.string.message_remove_banner_success,
                                                     Toast.LENGTH_SHORT).show();
-                                            bannerImageView.setImageDrawable(null);//
+                                            binding.imageViewBannerEditProfileActivity.setImageDrawable(null);//
                                         }
 
                                         @Override
@@ -195,15 +167,15 @@ public class EditProfileActivity extends BaseActivity {
             final String userAvatar = userData.getIconUrl();
             glide.load(userAvatar)
                     .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(216, 0)))
-                    .into(avatarImageView);
-            LayoutParams cAvatarLp = (LayoutParams) changeAvatar.getLayoutParams();
+                    .into(binding.imageViewAvatarEditProfileActivity);
+            LayoutParams cAvatarLp = (LayoutParams) binding.imageViewChangeAvatarEditProfileActivity.getLayoutParams();
             if (userAvatar.contains("avatar_default_")) {
-                changeAvatar.setLongClickable(false);
-                changeAvatar.setOnLongClickListener(v -> false);
+                binding.imageViewChangeAvatarEditProfileActivity.setLongClickable(false);
+                binding.imageViewChangeAvatarEditProfileActivity.setOnLongClickListener(v -> false);
             } else {
-                changeAvatar.setLongClickable(true);
-                changeAvatar.setOnLongClickListener(view -> {
-                    if (mAccountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                binding.imageViewChangeAvatarEditProfileActivity.setLongClickable(true);
+                binding.imageViewChangeAvatarEditProfileActivity.setOnLongClickListener(view -> {
+                    if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
                         return false;
                     }
                     new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialogTheme)
@@ -211,8 +183,8 @@ public class EditProfileActivity extends BaseActivity {
                             .setMessage(R.string.are_you_sure)
                             .setPositiveButton(R.string.yes, (dialogInterface, i)
                                     -> EditProfileUtils.deleteAvatar(mOauthRetrofit,
-                                    mAccessToken,
-                                    mAccountName,
+                                    accessToken,
+                                    accountName,
                                     new EditProfileUtils.EditProfileUtilsListener() {
                                         @Override
                                         public void success() {
@@ -234,21 +206,21 @@ public class EditProfileActivity extends BaseActivity {
                 });
             }
 
-            editTextAboutYou.setText(userData.getDescription());
-            editTextDisplayName.setText(userData.getTitle());
+            binding.editTextAboutYouEditProfileActivity.setText(userData.getDescription());
+            binding.editTextDisplayNameEditProfileActivity.setText(userData.getTitle());
         });
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode != RESULT_OK || data == null || mAccountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+        if (resultCode != RESULT_OK || data == null || accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
             return;
         }
         Intent intent = new Intent(this, EditProfileService.class);
         intent.setData(data.getData());
-        intent.putExtra(EditProfileService.EXTRA_ACCOUNT_NAME, mAccountName);
-        intent.putExtra(EditProfileService.EXTRA_ACCESS_TOKEN, mAccessToken);
+        intent.putExtra(EditProfileService.EXTRA_ACCOUNT_NAME, accountName);
+        intent.putExtra(EditProfileService.EXTRA_ACCESS_TOKEN, accessToken);
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         switch (requestCode) {
             case PICK_IMAGE_BANNER_REQUEST_CODE:
@@ -279,18 +251,18 @@ public class EditProfileActivity extends BaseActivity {
             return true;
         } else if (itemId == R.id.action_save_edit_profile_activity) {
             String displayName = null;
-            if (editTextDisplayName.getText() != null) {
-                displayName = editTextDisplayName.getText().toString();
+            if (binding.editTextDisplayNameEditProfileActivity.getText() != null) {
+                displayName = binding.editTextDisplayNameEditProfileActivity.getText().toString();
             }
             String aboutYou = null;
-            if (editTextAboutYou.getText() != null) {
-                aboutYou = editTextAboutYou.getText().toString();
+            if (binding.editTextAboutYouEditProfileActivity.getText() != null) {
+                aboutYou = binding.editTextAboutYouEditProfileActivity.getText().toString();
             }
             if (aboutYou == null || displayName == null) return false; //
 
             Intent intent = new Intent(this, EditProfileService.class);
-            intent.putExtra(EditProfileService.EXTRA_ACCOUNT_NAME, mAccountName);
-            intent.putExtra(EditProfileService.EXTRA_ACCESS_TOKEN, mAccessToken);
+            intent.putExtra(EditProfileService.EXTRA_ACCOUNT_NAME, accountName);
+            intent.putExtra(EditProfileService.EXTRA_ACCESS_TOKEN, accessToken);
             intent.putExtra(EditProfileService.EXTRA_DISPLAY_NAME, displayName); //
             intent.putExtra(EditProfileService.EXTRA_ABOUT_YOU, aboutYou); //
             intent.putExtra(EditProfileService.EXTRA_POST_TYPE, EditProfileService.EXTRA_POST_TYPE_SAVE_EDIT_PROFILE);
@@ -338,17 +310,22 @@ public class EditProfileActivity extends BaseActivity {
     }
 
     @Override
+    public SharedPreferences getCurrentAccountSharedPreferences() {
+        return mCurrentAccountSharedPreferences;
+    }
+
+    @Override
     public CustomThemeWrapper getCustomThemeWrapper() {
         return mCustomThemeWrapper;
     }
 
     @Override
     protected void applyCustomTheme() {
-        applyAppBarLayoutAndCollapsingToolbarLayoutAndToolbarTheme(appBarLayout, collapsingToolbarLayout, toolbar);
-        coordinatorLayout.setBackgroundColor(mCustomThemeWrapper.getBackgroundColor());
-        changeColorTextView(content, mCustomThemeWrapper.getPrimaryTextColor());
+        applyAppBarLayoutAndCollapsingToolbarLayoutAndToolbarTheme(binding.appbarLayoutViewEditProfileActivity, binding.collapsingToolbarLayoutEditProfileActivity, binding.toolbarViewEditProfileActivity);
+        binding.rootLayoutViewEditProfileActivity.setBackgroundColor(mCustomThemeWrapper.getBackgroundColor());
+        changeColorTextView(binding.contentViewEditProfileActivity, mCustomThemeWrapper.getPrimaryTextColor());
         if (typeface != null) {
-            Utils.setFontToAllTextViews(coordinatorLayout, typeface);
+            Utils.setFontToAllTextViews(binding.rootLayoutViewEditProfileActivity, typeface);
         }
     }
 

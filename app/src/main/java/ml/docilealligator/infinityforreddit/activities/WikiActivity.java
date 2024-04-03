@@ -98,6 +98,9 @@ public class WikiActivity extends BaseActivity {
     @Named("default")
     SharedPreferences mSharedPreferences;
     @Inject
+    @Named("current_account")
+    SharedPreferences mCurrentAccountSharedPreferences;
+    @Inject
     CustomThemeWrapper mCustomThemeWrapper;
     private String wikiMarkdown;
     private String mSubredditName;
@@ -213,7 +216,7 @@ public class WikiActivity extends BaseActivity {
         markwon = MarkdownUtils.createFullRedditMarkwon(this,
                 miscPlugin, emoteCloseBracketInlineProcessor, emotePlugin, imageAndGifPlugin, markdownColor, spoilerBackgroundColor, onLinkLongClickListener);
 
-        markwonAdapter = MarkdownUtils.createCustomTablesAdapter(imageAndGifEntry);
+        markwonAdapter = MarkdownUtils.createCustomTablesAndImagesAdapter(imageAndGifEntry);
         LinearLayoutManagerBugFixed linearLayoutManager = new SwipeLockLinearLayoutManager(this, new SwipeLockInterface() {
             @Override
             public void lockSwipe() {
@@ -322,6 +325,11 @@ public class WikiActivity extends BaseActivity {
     @Override
     public SharedPreferences getDefaultSharedPreferences() {
         return mSharedPreferences;
+    }
+
+    @Override
+    public SharedPreferences getCurrentAccountSharedPreferences() {
+        return mCurrentAccountSharedPreferences;
     }
 
     @Override
