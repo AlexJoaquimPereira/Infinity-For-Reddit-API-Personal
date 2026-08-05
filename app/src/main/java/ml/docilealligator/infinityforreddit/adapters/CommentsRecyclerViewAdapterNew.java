@@ -425,6 +425,14 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
                             currentUserDrawable, null, null, null);
                 }
 
+                if (comment.isStickied()) {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setImageDrawable(
+                            Utils.getTintedDrawable(mActivity, R.drawable.ic_thumbtack_24dp, mModeratorColor));
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.VISIBLE);
+                } else {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.GONE);
+                }
+
                 if (mShowAuthorAvatar) {
                     if (comment.getAuthorIconUrl() == null && comment.getAuthorFullName() != null && !comment.getAuthorFullName().isEmpty()) {
                         if (position >= 0) {
@@ -832,6 +840,7 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
         ImageView authorIconImageView;
         TextView authorTextView;
         TextView authorFlairTextView;
+        ImageView stickiedCommentImageView;
         TextView commentTimeTextView;
         TextView topScoreTextView;
         RecyclerView commentMarkdownView;
@@ -857,6 +866,7 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
                          ImageView authorIconImageView,
                          TextView authorTextView,
                          TextView authorFlairTextView,
+                         ImageView stickiedCommentImageView,
                          TextView commentTimeTextView,
                          TextView topScoreTextView,
                          RecyclerView commentMarkdownView,
@@ -876,6 +886,7 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
             this.authorIconImageView = authorIconImageView;
             this.authorTextView = authorTextView;
             this.authorFlairTextView = authorFlairTextView;
+            this.stickiedCommentImageView = stickiedCommentImageView;
             this.commentTimeTextView = commentTimeTextView;
             this.topScoreTextView = topScoreTextView;
             this.commentMarkdownView = commentMarkdownView;
@@ -1385,6 +1396,7 @@ public class CommentsRecyclerViewAdapterNew extends ListAdapter<Comment, Recycle
                     binding.authorIconImageViewItemPostComment,
                     binding.authorTextViewItemPostComment,
                     binding.authorFlairTextViewItemPostComment,
+                    binding.stickiedCommentImageViewItemPostComment,
                     binding.commentTimeTextViewItemPostComment,
                     binding.topScoreTextViewItemPostComment,
                     binding.commentMarkdownViewItemPostComment,

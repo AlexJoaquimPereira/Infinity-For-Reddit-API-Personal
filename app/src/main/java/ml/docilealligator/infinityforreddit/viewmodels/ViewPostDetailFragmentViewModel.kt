@@ -447,6 +447,81 @@ class ViewPostDetailFragmentViewModel(
         })
     }
 
+    fun toggleSticky(comment: Comment, position: Int) {
+        val params: MutableMap<String, String> = HashMap()
+        params[APIUtils.ID_KEY] = comment.fullName
+        params[APIUtils.HOW_KEY] = APIUtils.HOW_YES
+        params[APIUtils.STICKY_KEY] = (!comment.isStickied).toString()
+        oauthRetrofit.create(RedditAPI::class.java)
+            .toggleDistinguishedThing(APIUtils.getOAuthHeader(accessToken), params)
+            .enqueue(object : Callback<String?> {
+                override fun onResponse(call: Call<String?>, response: Response<String?>) {
+                    if (response.isSuccessful) {
+                        comment.setStickied(!comment.isStickied)
+                        commentModerationEventLiveData.postValue(
+                            if (comment.isStickied) CommentModerationEvent.SetStickyComment(
+                                comment,
+                                position
+                            ) else CommentModerationEvent.UnsetStickyComment(comment, position)
+                        )
+                    } else {
+                        commentModerationEventLiveData.postValue(
+                            if (comment.isStickied) CommentModerationEvent.UnsetStickyCommentFailed(
+                                comment,
+                                position
+                            ) else CommentModerationEvent.SetStickyCommentFailed(comment, position)
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<String?>, throwable: Throwable) {
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isStickied) CommentModerationEvent.UnsetStickyCommentFailed(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.SetStickyCommentFailed(comment, position)
+                    )
+                }
+            })
+    }
+
+    fun toggleMod(comment: Comment, position: Int) {
+        val params: MutableMap<String, String> = HashMap()
+        params[APIUtils.ID_KEY] = comment.fullName
+        params[APIUtils.HOW_KEY] = if (comment.isModerator) APIUtils.HOW_NO else APIUtils.HOW_YES
+        oauthRetrofit.create(RedditAPI::class.java)
+            .toggleDistinguishedThing(APIUtils.getOAuthHeader(accessToken), params)
+            .enqueue(object : Callback<String?> {
+                override fun onResponse(call: Call<String?>, response: Response<String?>) {
+                    if (response.isSuccessful) {
+                        comment.setIsModerator(!comment.isModerator)
+                        commentModerationEventLiveData.postValue(
+                            if (comment.isModerator) CommentModerationEvent.DistinguishedAsMod(
+                                comment,
+                                position
+                            ) else CommentModerationEvent.UndistinguishedAsMod(comment, position)
+                        )
+                    } else {
+                        commentModerationEventLiveData.postValue(
+                            if (comment.isModerator) CommentModerationEvent.UndistinguishAsModFailed(
+                                comment,
+                                position
+                            ) else CommentModerationEvent.DistinguishAsModFailed(comment, position)
+                        )
+                    }
+                }
+
+                override fun onFailure(call: Call<String?>, throwable: Throwable) {
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isModerator) CommentModerationEvent.UndistinguishAsModFailed(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.DistinguishAsModFailed(comment, position)
+                    )
+                }
+            })
+    }
+
     companion object {
         fun provideFactory(oauthRetrofit: Retrofit, accessToken: String?, accountName: String?) : ViewModelProvider.Factory {
             return object: ViewModelProvider.Factory {

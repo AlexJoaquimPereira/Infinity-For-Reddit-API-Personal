@@ -570,4 +570,14 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
     public void toggleLock(@NonNull Comment comment, int position) {
         mCommentViewModel.toggleLock(comment, position);
     }
+
+    @Override
+    public void toggleSticky(@NonNull Comment comment, int position) {
+        mCommentViewModel.toggleSticky(comment, position);
+    }
+
+    @Override
+    public void toggleMod(@NonNull Comment comment, int position) {
+        mCommentViewModel.toggleMod(comment, position);
+    }
 }

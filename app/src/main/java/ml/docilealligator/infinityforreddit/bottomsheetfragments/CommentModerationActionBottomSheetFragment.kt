@@ -79,6 +79,32 @@ class CommentModerationActionBottomSheetFragment : LandscapeExpandedRoundedBotto
                 (parentFragment as CommentModerationActionHandler).toggleLock(comment, position)
                 dismiss()
             }
+
+            if (comment.depth > 0) {
+                binding.toggleStickyTextViewCommentModerationActionBottomSheetFragment.visibility = View.GONE
+            } else {
+                activity?.let {
+                    binding.toggleStickyTextViewCommentModerationActionBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                        AppCompatResources.getDrawable(it, if (comment.isStickied) R.drawable.ic_unstick_post_24dp else R.drawable.ic_stick_post_24dp), null, null, null
+                    )
+                }
+                binding.toggleStickyTextViewCommentModerationActionBottomSheetFragment.setText(if (comment.isStickied) R.string.unset_sticky_comment else R.string.set_sticky_comment)
+                binding.toggleStickyTextViewCommentModerationActionBottomSheetFragment.setOnClickListener {
+                    (parentFragment as CommentModerationActionHandler).toggleSticky(comment, position)
+                    dismiss()
+                }
+            }
+
+            activity?.let {
+                binding.toggleModTextViewCommentModerationActionBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                    AppCompatResources.getDrawable(it, if (comment.isModerator) R.drawable.ic_undistinguish_as_mod_24dp else R.drawable.ic_distinguish_as_mod_24dp), null, null, null
+                )
+            }
+            binding.toggleModTextViewCommentModerationActionBottomSheetFragment.setText(if (comment.isModerator) R.string.undistinguish_as_mod else R.string.distinguish_as_mod)
+            binding.toggleModTextViewCommentModerationActionBottomSheetFragment.setOnClickListener {
+                (parentFragment as CommentModerationActionHandler).toggleMod(comment, position)
+                dismiss()
+            }
         }
 
         return binding.root

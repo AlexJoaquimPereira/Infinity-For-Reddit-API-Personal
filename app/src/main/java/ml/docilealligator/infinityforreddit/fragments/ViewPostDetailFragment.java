@@ -2221,4 +2221,14 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     public void toggleLock(@NonNull Comment comment, int position) {
         viewPostDetailFragmentViewModel.toggleLock(comment, position);
     }
+
+    @Override
+    public void toggleSticky(@NonNull Comment comment, int position) {
+        viewPostDetailFragmentViewModel.toggleSticky(comment, position);
+    }
+
+    @Override
+    public void toggleMod(@NonNull Comment comment, int position) {
+        viewPostDetailFragmentViewModel.toggleMod(comment, position);
+    }
 }

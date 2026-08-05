@@ -20,6 +20,18 @@ sealed class CommentModerationEvent(open val comment: Comment?, open val positio
     data class Unlocked(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.unlocked)
     data class UnlockFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.unlock_failed)
 
+    data class SetStickyComment(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.set_sticky_comment)
+    data class SetStickyCommentFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.set_sticky_comment_failed)
+
+    data class UnsetStickyComment(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.unset_sticky_comment)
+    data class UnsetStickyCommentFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.unset_sticky_comment_failed)
+
+    data class DistinguishedAsMod(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.distinguished_as_mod)
+    data class DistinguishAsModFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.distinguish_as_mod_failed)
+
+    data class UndistinguishedAsMod(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.undistinguished_as_mod)
+    data class UndistinguishAsModFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.undistinguish_as_mod_failed)
+
     data class SetReceiveNotification(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.reply_notifications_enabled)
     data class SetReceiveNotificationFailed(override val comment: Comment, override val position: Int) : CommentModerationEvent(comment, position, R.string.toggle_reply_notifications_failed)
 

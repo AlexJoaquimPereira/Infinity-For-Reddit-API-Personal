@@ -452,6 +452,14 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                             currentUserDrawable, null, null, null);
                 }
 
+                if (comment.isStickied()) {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setImageDrawable(
+                            Utils.getTintedDrawable(mActivity, R.drawable.ic_thumbtack_24dp, mModeratorColor));
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.VISIBLE);
+                } else {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.GONE);
+                }
+
                 if (mShowAuthorAvatar) {
                     if (comment.getAuthorIconUrl() == null) {
                         int startIndex = translatePositionToCommentIndex(position);
@@ -1152,6 +1160,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             originalComment.setApprovedBy(comment.getApprovedBy());
             originalComment.setRemoved(comment.isRemoved(), comment.isSpam());
             originalComment.setLocked(comment.isLocked());
+            originalComment.setStickied(comment.isStickied());
+            originalComment.setIsModerator(comment.isModerator());
 
             if (mIsSingleCommentThreadMode) {
                 notifyItemChanged(position + 1);
@@ -1167,6 +1177,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     currentComment.setApprovedBy(comment.getApprovedBy());
                     currentComment.setRemoved(comment.isRemoved(), comment.isSpam());
                     currentComment.setLocked(comment.isLocked());
+                    currentComment.setStickied(comment.isStickied());
+                    currentComment.setIsModerator(comment.isModerator());
 
                     if (mIsSingleCommentThreadMode) {
                         notifyItemChanged(i + 1);
@@ -1337,6 +1349,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         ImageView authorIconImageView;
         TextView authorTextView;
         TextView authorFlairTextView;
+        ImageView stickiedCommentImageView;
         TextView commentTimeTextView;
         TextView topScoreTextView;
         RecyclerView commentMarkdownView;
@@ -1362,6 +1375,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                          ImageView authorIconImageView,
                          TextView authorTextView,
                          TextView authorFlairTextView,
+                         ImageView stickiedCommentImageView,
                          TextView commentTimeTextView,
                          TextView topScoreTextView,
                          RecyclerView commentMarkdownView,
@@ -1381,6 +1395,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             this.authorIconImageView = authorIconImageView;
             this.authorTextView = authorTextView;
             this.authorFlairTextView = authorFlairTextView;
+            this.stickiedCommentImageView = stickiedCommentImageView;
             this.commentTimeTextView = commentTimeTextView;
             this.topScoreTextView = topScoreTextView;
             this.commentMarkdownView = commentMarkdownView;
@@ -1931,6 +1946,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     binding.authorIconImageViewItemPostComment,
                     binding.authorTextViewItemPostComment,
                     binding.authorFlairTextViewItemPostComment,
+                    binding.stickiedCommentImageViewItemPostComment,
                     binding.commentTimeTextViewItemPostComment,
                     binding.topScoreTextViewItemPostComment,
                     binding.commentMarkdownViewItemPostComment,

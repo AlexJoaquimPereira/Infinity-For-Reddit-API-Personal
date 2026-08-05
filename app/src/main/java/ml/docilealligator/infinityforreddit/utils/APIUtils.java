@@ -127,6 +127,7 @@ public class APIUtils {
     public static final String HOW_KEY = "how";
     public static final String HOW_YES = "yes";
     public static final String HOW_NO = "no";
+    public static final String STICKY_KEY = "sticky";
 
     public static final String PLATFORM_KEY = "platform";
 

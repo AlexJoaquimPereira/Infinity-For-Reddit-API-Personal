@@ -10,6 +10,7 @@ import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -276,6 +277,14 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     ((CommentBaseViewHolder) holder).authorFlairTextView.setText(comment.getAuthorFlair());
                 }
 
+                if (comment.isStickied()) {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setImageDrawable(
+                            Utils.getTintedDrawable(mActivity, R.drawable.ic_thumbtack_24dp, mColorAccent));
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.VISIBLE);
+                } else {
+                    ((CommentBaseViewHolder) holder).stickiedCommentImageView.setVisibility(View.GONE);
+                }
+
                 if (mShowElapsedTime) {
                     ((CommentBaseViewHolder) holder).commentTimeTextView.setText(
                             Utils.getElapsedTime(mActivity, comment.getCommentTimeMillis()));
@@ -465,6 +474,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         LinearLayout linearLayout;
         TextView authorTextView;
         TextView authorFlairTextView;
+        ImageView stickiedCommentImageView;
         TextView commentTimeTextView;
         RecyclerView commentMarkdownView;
         ConstraintLayout bottomConstraintLayout;
@@ -485,6 +495,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         void setBaseView(LinearLayout linearLayout,
                          TextView authorTextView,
                          TextView authorFlairTextView,
+                         ImageView stickiedCommentImageView,
                          TextView commentTimeTextView,
                          RecyclerView commentMarkdownView,
                          ConstraintLayout bottomConstraintLayout,
@@ -501,6 +512,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             this.linearLayout = linearLayout;
             this.authorTextView = authorTextView;
             this.authorFlairTextView = authorFlairTextView;
+            this.stickiedCommentImageView = stickiedCommentImageView;
             this.commentTimeTextView = commentTimeTextView;
             this.commentMarkdownView = commentMarkdownView;
             this.bottomConstraintLayout = bottomConstraintLayout;
@@ -873,6 +885,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             setBaseView(binding.linearLayoutItemComment,
                     binding.authorTextViewItemPostComment,
                     binding.authorFlairTextViewItemPostComment,
+                    binding.stickiedCommentImageViewItemPostComment,
                     binding.commentTimeTextViewItemPostComment,
                     binding.commentMarkdownViewItemPostComment,
                     binding.bottomConstraintLayoutItemPostComment,

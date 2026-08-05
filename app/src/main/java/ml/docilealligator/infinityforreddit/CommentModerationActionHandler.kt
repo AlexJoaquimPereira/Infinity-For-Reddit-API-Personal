@@ -6,4 +6,6 @@ interface CommentModerationActionHandler {
     fun approveComment(comment: Comment, position: Int)
     fun removeComment(comment: Comment, position: Int, isSpam: Boolean)
     fun toggleLock(comment: Comment, position: Int)
+    fun toggleSticky(comment: Comment, position: Int)
+    fun toggleMod(comment: Comment, position: Int)
 }

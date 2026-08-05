@@ -1643,6 +1643,10 @@
     <string name="set_sticky_post_failed">Set sticky post failed</string>
     <string name="unset_sticky_post">Unset sticky post</string>
     <string name="unset_sticky_post_failed">Unset sticky post failed</string>
+    <string name="set_sticky_comment">Set sticky comment</string>
+    <string name="set_sticky_comment_failed">Set sticky comment failed</string>
+    <string name="unset_sticky_comment">Unset sticky comment</string>
+    <string name="unset_sticky_comment_failed">Unset sticky comment failed</string>
     <string name="lock">Lock</string>
     <string name="locked">Locked</string>
     <string name="lock_failed">Lock failed</string>

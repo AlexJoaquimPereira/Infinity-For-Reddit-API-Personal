@@ -57,6 +57,7 @@ public class Comment implements Parcelable {
     private boolean saved;
     private boolean sendReplies;
     private boolean locked;
+    private boolean stickied;
     private boolean canModComment;
     private boolean approved;
     private long approvedAtUTC;
@@ -82,7 +83,7 @@ public class Comment implements Parcelable {
                    int depth, boolean collapsed, boolean hasReply,
                    boolean scoreHidden, boolean saved, boolean sendReplies, boolean locked, boolean canModComment,
                    boolean approved, long approvedAtUTC, String approvedBy, boolean removed, boolean spam,
-                   long edited, Map<String, MediaMetadata> mediaMetadataMap) {
+                   boolean stickied, long edited, Map<String, MediaMetadata> mediaMetadataMap) {
         this.id = id;
         this.fullName = fullName;
         this.author = author;
@@ -108,6 +109,7 @@ public class Comment implements Parcelable {
         this.saved = saved;
         this.sendReplies = sendReplies;
         this.locked = locked;
+        this.stickied = stickied;
         this.canModComment = canModComment;
         this.approved = approved;
         this.approvedAtUTC = approvedAtUTC;
@@ -163,6 +165,7 @@ public class Comment implements Parcelable {
         this.saved = commentToBeCopied.saved;
         this.sendReplies = commentToBeCopied.sendReplies;
         this.locked = commentToBeCopied.locked;
+        this.stickied = commentToBeCopied.stickied;
         this.canModComment = commentToBeCopied.canModComment;
         this.approved = commentToBeCopied.approved;
         this.approvedAtUTC = commentToBeCopied.approvedAtUTC;
@@ -209,6 +212,7 @@ public class Comment implements Parcelable {
         saved = in.readByte() != 0;
         sendReplies = in.readByte() != 0;
         locked = in.readByte() != 0;
+        stickied = in.readByte() != 0;
         canModComment = in.readByte() != 0;
         approved = in.readByte() != 0;
         approvedAtUTC = in.readLong();
@@ -329,6 +333,10 @@ public class Comment implements Parcelable {
         return distinguished != null && distinguished.equals("moderator");
     }
 
+    public void setIsModerator(boolean value) {
+        distinguished = value ? "moderator" : null;
+    }
+
     public boolean isAdmin() {
         return distinguished != null && distinguished.equals("admin");
     }
@@ -387,6 +395,14 @@ public class Comment implements Parcelable {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public boolean isStickied() {
+        return stickied;
+    }
+
+    public void setStickied(boolean stickied) {
+        this.stickied = stickied;
     }
 
     public boolean isCanModComment() {
@@ -589,6 +605,7 @@ public class Comment implements Parcelable {
         parcel.writeByte((byte) (saved ? 1 : 0));
         parcel.writeByte((byte) (sendReplies ? 1 : 0));
         parcel.writeByte((byte) (locked ? 1 : 0));
+        parcel.writeByte((byte) (stickied ? 1 : 0));
         parcel.writeByte((byte) (canModComment ? 1 : 0));
         parcel.writeByte((byte) (approved ? 1 : 0));
         parcel.writeLong(approvedAtUTC);

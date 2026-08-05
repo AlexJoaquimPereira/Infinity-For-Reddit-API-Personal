@@ -2280,6 +2280,87 @@ class ViewPostDetailFragmentViewModelNew(
         }
     }
 
+    fun toggleSticky(comment: Comment, position: Int) {
+        viewModelScope.launch {
+            val params: MutableMap<String, String> = HashMap()
+            params[APIUtils.ID_KEY] = comment.fullName
+            params[APIUtils.HOW_KEY] = APIUtils.HOW_YES
+            params[APIUtils.STICKY_KEY] = (!comment.isStickied).toString()
+            try {
+                val response = oauthRetrofit.create(RedditAPIKt::class.java)
+                    .toggleDistinguishedThing(APIUtils.getOAuthHeader(accessToken), params)
+
+                if (response.isSuccessful) {
+                    comment.setStickied(!comment.isStickied)
+
+                    updateModdedStatus(comment, position)
+
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isStickied) CommentModerationEvent.SetStickyComment(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.UnsetStickyComment(comment, position)
+                    )
+                } else {
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isStickied) CommentModerationEvent.UnsetStickyCommentFailed(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.SetStickyCommentFailed(comment, position)
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                commentModerationEventLiveData.postValue(
+                    if (comment.isStickied) CommentModerationEvent.UnsetStickyCommentFailed(
+                        comment,
+                        position
+                    ) else CommentModerationEvent.SetStickyCommentFailed(comment, position)
+                )
+            }
+        }
+    }
+
+    fun toggleMod(comment: Comment, position: Int) {
+        viewModelScope.launch {
+            val params: MutableMap<String, String> = HashMap()
+            params[APIUtils.ID_KEY] = comment.fullName
+            params[APIUtils.HOW_KEY] = if (comment.isModerator) APIUtils.HOW_NO else APIUtils.HOW_YES
+            try {
+                val response = oauthRetrofit.create(RedditAPIKt::class.java)
+                    .toggleDistinguishedThing(APIUtils.getOAuthHeader(accessToken), params)
+
+                if (response.isSuccessful) {
+                    comment.setIsModerator(!comment.isModerator)
+
+                    updateModdedStatus(comment, position)
+
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isModerator) CommentModerationEvent.DistinguishedAsMod(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.UndistinguishedAsMod(comment, position)
+                    )
+                } else {
+                    commentModerationEventLiveData.postValue(
+                        if (comment.isModerator) CommentModerationEvent.UndistinguishAsModFailed(
+                            comment,
+                            position
+                        ) else CommentModerationEvent.DistinguishAsModFailed(comment, position)
+                    )
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                commentModerationEventLiveData.postValue(
+                    if (comment.isModerator) CommentModerationEvent.UndistinguishAsModFailed(
+                        comment,
+                        position
+                    ) else CommentModerationEvent.DistinguishAsModFailed(comment, position)
+                )
+            }
+        }
+    }
+
     fun updateModdedStatus(comment: Comment, position: Int) {
         _dataState.value.comments?.let { comments ->
             comments.getOrNull(position)?.let {
@@ -2290,6 +2371,8 @@ class ViewPostDetailFragmentViewModelNew(
                     updatedComment.approvedBy = comment.approvedBy
                     updatedComment.setRemoved(comment.isRemoved, comment.isSpam)
                     updatedComment.isLocked = comment.isLocked
+                    updatedComment.setStickied(comment.isStickied)
+                    updatedComment.setIsModerator(comment.isModerator)
 
                     val updatedComments = ArrayList(comments)
                     updatedComments[position] = updatedComment
@@ -2309,6 +2392,8 @@ class ViewPostDetailFragmentViewModelNew(
                 updatedComment.approvedBy = comment.approvedBy
                 updatedComment.setRemoved(comment.isRemoved, comment.isSpam)
                 updatedComment.isLocked = comment.isLocked
+                updatedComment.setStickied(comment.isStickied)
+                updatedComment.setIsModerator(comment.isModerator)
 
                 val updatedComments = ArrayList(comments)
                 updatedComments[correctPosition] = updatedComment
